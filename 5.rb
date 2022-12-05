@@ -1,20 +1,18 @@
-def parse_instructions(instructions)
-  stack_instructions, move_instructions = instructions.split("\n\n").map(&:lines)
+def parse_instructions(stack_instructions)
   stack_numbers = stack_instructions.last
   stacks = stack_numbers.scan(/\d/).map { [] }
   stack_instructions[0...-1].each do |row|
     stacks.each.with_index do |stack, index|
-      stack_number = (index + 1).to_s
-      crate = row[stack_numbers.index(stack_number)]
+      crate = row[stack_numbers.index((index + 1).to_s)]
       stack << crate unless crate.strip.empty?
     end
   end
-  [stacks.map(&:compact), move_instructions]
+  stacks.map(&:compact)
 end
 
-instructions = DATA.read
+stack_instructions, move_instructions = DATA.read.split("\n\n").map(&:lines)
 # A
-stacks, move_instructions = parse_instructions(instructions)
+stacks = parse_instructions(stack_instructions)
 move_instructions.each do |instruction|
   num, from, to = instruction.scan(/\d+/).map(&:to_i)
   num.times do
@@ -26,7 +24,7 @@ end
 p "#a: #{stacks.map(&:first).join}"
 
 # B
-stacks, move_instructions = parse_instructions(instructions)
+stacks = parse_instructions(stack_instructions)
 move_instructions.each do |instruction|
   num, from, to = instruction.scan(/\d+/).map(&:to_i)
   crates = stacks[from - 1].shift(num)

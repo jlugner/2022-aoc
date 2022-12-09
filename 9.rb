@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'set'
+
 moves = DATA.readlines.map { _1.split(' ').then { |dir, steps| [dir, Integer(steps)] } }
 Coordinate = Struct.new(:x, :y) do
   def diffs(other) = [x - other.x, y - other.y]
@@ -15,9 +17,7 @@ def move_direction(diff) = if diff.positive?
 
 def simulate_rope(knot_count:, move_list:)
   positions = [Coordinate.new(0, 0)] * knot_count
-  tail_visits = [positions.last]
-
-  move_list.each do |direction, steps|
+  move_list.each_with_object(Set[positions.last]) do |(direction, steps), tail_visits|
     steps.times do
       case direction
       when 'L' then positions[0] = Coordinate.new(positions[0].x - 1, positions[0].y)
@@ -45,12 +45,10 @@ def simulate_rope(knot_count:, move_list:)
       tail_visits << positions.last
     end
   end
-
-  tail_visits.uniq.count
 end
 
-p "a: #{simulate_rope(knot_count: 2, move_list: moves)}"
-p "b: #{simulate_rope(knot_count: 10, move_list: moves)}"
+p "a: #{simulate_rope(knot_count: 2, move_list: moves).count}"
+p "b: #{simulate_rope(knot_count: 10, move_list: moves).count}"
 __END__
 L 2
 D 2

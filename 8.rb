@@ -24,12 +24,12 @@ pp "A: #{visible_trees.map(&:sum).sum}"
 # B
 spots = tree_rows.map.with_index do |row, y|
   row.map.with_index do |tree, x|
-    before_x = row[0...x]
-    after_x = row[(x + 1)...]
-    before_y = (0...y).map { tree_rows[_1][x] }
-    after_y = ((y + 1)...tree_rows.length).map { tree_rows[_1][x] }
+    left = row[0...x].reverse
+    right = row[(x + 1)...]
+    up = (0...y).map { tree_rows[_1][x] }.reverse
+    down = ((y + 1)...tree_rows.length).map { tree_rows[_1][x] }
 
-    [before_x.reverse, after_x, before_y.reverse, after_y].map do |trees|
+    [left, right, up, down].map do |trees|
       visible_trees = trees.take_while { tree > _1 }.count
       if visible_trees != trees.count # not edge stop, include stopping tree
         visible_trees + 1

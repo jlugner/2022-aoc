@@ -18,11 +18,9 @@ def compair(packet1, packet2)
     1
   in [_, []]
     -1
-  in [Array, Array]
-    val1, *rest1 = packet1
-    val2, *rest2 = packet2
-    first_comp = compair(val1, val2)
-    return compair(rest1, rest2) if first_comp.zero?
+  in [[head1, *tail1], [head2, *tail2]]
+    first_comp = compair(head1, head2)
+    return compair(tail1, tail2) if first_comp.zero?
 
     first_comp
   else raise "Unkown pattern #{[packet1, packet2]}"

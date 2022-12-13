@@ -68,9 +68,7 @@ def shortest_path(map, start:, goal:)
 
     return recreate_path(current) if current == goal
 
-    neighbors = neighbors(current, grid).reject do |candidate|
-      candidate.height > current.height + 1
-    end
+    neighbors = neighbors(current, grid).reject { _1.height > current.height + 1 }
 
     neighbors.each do |neighbor|
       if neighbor.g_score > current.g_score + 1

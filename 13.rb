@@ -5,13 +5,7 @@ def compair(packet1, packet2)
   in [Integer, Array] | [Array, Integer]
     compair(Array(packet1), Array(packet2))
   in [Integer, Integer]
-    if packet1 < packet2
-      1
-    elsif packet1 == packet2
-      0
-    else
-      -1
-    end
+    packet2 <=> packet1
   in [[], []]
     0
   in [[], _]

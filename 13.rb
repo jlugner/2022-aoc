@@ -23,7 +23,6 @@ def compair(packet1, packet2)
     return compair(tail1, tail2) if first_comp.zero?
 
     first_comp
-  else raise "Unkown pattern #{[packet1, packet2]}"
   end
 end
 

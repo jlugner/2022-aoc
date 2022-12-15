@@ -8,9 +8,10 @@ end
 
 sensors = DATA.readlines.map { Sensor.new(*_1.scan(/-?\d+/).map(&:to_i)) }
 
-def build_row(sensors, low_x, high_x, y)
-  beacon_xs = sensors.filter_map { _1.close_y == y && _1.close_x }
-  blocked_xs = sensors.each_with_object([]) do |sensor, arr|
+def find_available_on_row(sensors, low_x, high_x, y)
+  applicable_sensors = sensors.filter { ((_1.y - _1.beacon_distance)..(_1.y + _1.beacon_distance)).cover?(y) }
+  beacon_xs = applicable_sensors.filter_map { _1.close_y == y && _1.close_x }
+  blocked_xs = applicable_sensors.each_with_object([]) do |sensor, arr|
     low_x.upto(high_x) do |x|
       coordinate_distance = distance(sensor.x, x, sensor.y, y)
       arr << x if sensor.beacon_distance >= coordinate_distance
@@ -20,12 +21,41 @@ def build_row(sensors, low_x, high_x, y)
   low_x.upto(high_x).to_a - blocked_xs - beacon_xs
 end
 
+def find_single_available(sensors, low_bound, high_bound)
+  sensors.each do |sensor|
+    low_y = [low_bound, sensor.y - sensor.beacon_distance - 1].max
+    high_y = [high_bound, sensor.y + sensor.beacon_distance + 1].min
+    low_x = [low_bound, sensor.x - sensor.beacon_distance - 1].max
+    high_x = [high_bound, sensor.x + sensor.beacon_distance + 1].min
+    low_y.upto(high_y).each do |y|
+      width = (sensor.beacon_distance + 1) - (y - sensor.y).abs
+      [sensor.x - width, sensor.x + width].each do |x|
+        next if x < low_x || x > high_x
+        break if sensors.any? do |other_sensor|
+          next if sensor == other_sensor
+
+          coordinate_distance = distance(other_sensor.x, x, other_sensor.y, y)
+          coordinate_distance <= other_sensor.beacon_distance
+        end
+
+        return [x, y]
+      end
+    end
+  end
+end
+
 # A
 lower_x_bound = sensors.map { [_1.x, _1.close_x, _1.x - _1.beacon_distance].min }.min
 upper_x_bound = sensors.map { [_1.x, _1.close_x, _1.x + _1.beacon_distance].max }.max
-available_slots = build_row(sensors, lower_x_bound, upper_x_bound, 200_000_0)
+available_slots = find_available_on_row(sensors, lower_x_bound, upper_x_bound, 200_000_0)
 claimed = (upper_x_bound - lower_x_bound) - available_slots.count
 pp "A: #{claimed}"
+
+# B
+bound = 400_000_0
+x, y = find_single_available(sensors, 0, bound)
+
+p "B: #{x * bound + y}"
 
 __END__
 Sensor at x=3291456, y=3143280: closest beacon is at x=3008934, y=2768339
